@@ -13,7 +13,8 @@
     }
   ],
   "applications": null,
-  "entrypoint": "dist/main",
+  "entrypoint--": "dist/main",
+  "entrypoint": "reload.sh",
   "first_run": "",
   "build": {
     "build": "rm -f module.tar.gz && tar czf module.tar.gz requirements.txt src/*.py src/models/*.py meta.json setup.sh reload.sh",
