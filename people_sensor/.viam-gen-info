@@ -1,0 +1,12 @@
+{
+  "module_name": "people_sensor",
+  "namespace": "cwb",
+  "language": "python",
+  "resource_type": "component",
+  "resource_subtype": "sensor",
+  "model_name": "people_sensor",
+  "enable_cloud_build": true,
+  "initialize_git": false,
+  "generator_version": "0.1.0",
+  "generated_on": "2025-03-20T00:07:58.995557932Z"
+}

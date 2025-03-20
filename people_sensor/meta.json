@@ -1,0 +1,27 @@
+{
+  "$schema": "https://dl.viam.dev/module.schema.json",
+  "module_id": "cwb:people_sensor",
+  "visibility": "private",
+  "url": "",
+  "description": "Modular sensor component: people_sensor",
+  "models": [
+    {
+      "api": "rdk:component:sensor",
+      "model": "cwb:sensor:people_sensor",
+      "short_description": "Provide a short (100 characters or less) description of this model here",
+      "markdown_link": "README.md#model-cwbpeople_sensorpeople_sensor"
+    }
+  ],
+  "applications": null,
+  "entrypoint": "dist/main",
+  "first_run": "",
+  "build": {
+    "build": "rm -f module.tar.gz && tar czf module.tar.gz requirements.txt src/*.py src/models/*.py meta.json setup.sh reload.sh",
+    "setup": "./setup.sh",
+    "path": "module.tar.gz",
+    "arch": [
+      "linux/amd64",
+      "linux/arm64"
+    ]
+  }
+}
