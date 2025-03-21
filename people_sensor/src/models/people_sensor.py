@@ -27,6 +27,7 @@ class PeopleSensor(Sensor, EasyResource):
     _label: str
     _visionClient: VisionClient
     _cameraName: str
+    _dependencies: Mapping[ResourceName, ResourceBase]
 
     @classmethod
     def new(
@@ -55,6 +56,7 @@ class PeopleSensor(Sensor, EasyResource):
         Returns:
             Sequence[str]: A list of implicit dependencies
         """
+
         fields = struct_to_dict(config.attributes)
         label = fields.get('label', None)
         if label is None:
@@ -64,19 +66,19 @@ class PeopleSensor(Sensor, EasyResource):
         if cameraName is None:
             raise Exception("Config must specify 'camera_name' for sensor to detect.")
 
-        # need to have dependency on vision service
         return []
 
-    def reconfigure(
-        self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]
-    ):
+    def reconfigure(self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]):
         """This method allows you to dynamically update your service when it receives a new `config` object.
 
         Args:
             config (ComponentConfig): The new configuration
             dependencies (Mapping[ResourceName, ResourceBase]): Any dependencies (both implicit and explicit)
         """
+
         self._configFields = struct_to_dict(config.attributes)
+        self._dependencies = list(dependencies.values())
+        LOGGER.info('self._dependencies %r', self._dependencies)
 
         # given validate_config this should be safe
         self._label = self._configFields['label']
@@ -94,7 +96,6 @@ class PeopleSensor(Sensor, EasyResource):
         self._visionClient = visionClients[0]
         LOGGER.info('self._visionClient %r', self._visionClient)
         return super().reconfigure(config, dependencies)
-
 
     async def get_readings(
         self,
