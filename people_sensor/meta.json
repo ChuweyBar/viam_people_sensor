@@ -2,26 +2,26 @@
   "$schema": "https://dl.viam.dev/module.schema.json",
   "module_id": "cwb:people_sensor",
   "visibility": "public",
-  "url": "",
+  "url": "https://github.com/ChuweyBar/viam_people_sensor",
   "description": "Modular sensor component: people_sensor",
   "models": [
     {
       "api": "rdk:component:sensor",
-      "model": "cwb:sensor:people_sensor",
-      "short_description": "Provide a short (100 characters or less) description of this model here",
-      "markdown_link": "README.md#model-cwbpeople_sensorpeople_sensor"
+      "model": "cwb:people_sensor:people_sensor",
+      "short_description": "Configurable sensor that detect label from vision service",
+      "markdown_link": "README.md#model-cwbsensorpeople_sensor"
     }
   ],
   "applications": null,
-  "entrypoint--": "dist/main",
-  "entrypoint": "reload.sh",
+  "entrypoint": "dist/main",
+  "entrypoint--": "reload.sh",
   "first_run": "",
   "build": {
-    "build--": "./build.sh",
-    "build": "rm -f module.tar.gz && tar czf module.tar.gz requirements.txt src/*.py src/models/*.py meta.json setup.sh reload.sh",
+    "build": "./build.sh",
+    "build--": "rm -f module.tar.gz && tar czf module.tar.gz requirements.txt src/*.py src/models/*.py meta.json setup.sh reload.sh",
     "setup": "./setup.sh",
-    "path--": "dist/asrchive.tar.gz",
-    "path": "module.tar.gz",
+    "path": "dist/asrchive.tar.gz",
+    "path--": "module.tar.gz",
     "arch": [
       "linux/amd64",
       "linux/arm64"
