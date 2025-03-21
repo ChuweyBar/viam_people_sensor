@@ -10,13 +10,12 @@ from viam.resource.easy_resource import EasyResource
 from viam.resource.types import Model, ModelFamily
 from viam.utils import SensorReading, ValueTypes, struct_to_dict
 
-from viam.logging import getLogger
+#from viam.logging import getLogger
 
-from viam.services.vision import Vision, VisionClient
+from viam.services.vision.client import VisionClient
+from viam.components.camera.client import CameraClient
 
-from viam.services.vision import Detection
-
-LOGGER = getLogger(__name__)
+#log = getLogger(__name__)
 
 class PeopleSensor(Sensor, EasyResource):
     # To enable debug-level logging, either run viam-server with the --debug option,
@@ -25,9 +24,8 @@ class PeopleSensor(Sensor, EasyResource):
 
     _configFields: Dict
     _label: str
-    _visionClient: VisionClient
-    _cameraName: str
-    _dependencies: Mapping[ResourceName, ResourceBase]
+    _visionClient: VisionClient = None
+    _cameraClient: CameraClient = None
 
     @classmethod
     def new(
@@ -56,16 +54,12 @@ class PeopleSensor(Sensor, EasyResource):
         Returns:
             Sequence[str]: A list of implicit dependencies
         """
-
+        """
         fields = struct_to_dict(config.attributes)
-        label = fields.get('label', None)
+        label = fields.get('label')
         if label is None:
             raise Exception("Config must specify 'label' field for sensor to detect.")
-
-        cameraName = fields.get('camera_name', None)
-        if cameraName is None:
-            raise Exception("Config must specify 'camera_name' for sensor to detect.")
-
+        """
         return []
 
     def reconfigure(self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]):
@@ -77,24 +71,26 @@ class PeopleSensor(Sensor, EasyResource):
         """
 
         self._configFields = struct_to_dict(config.attributes)
-        self._dependencies = list(dependencies.values())
-        LOGGER.info('self._dependencies %r', self._dependencies)
+        clients = list(dependencies.values())
 
         # given validate_config this should be safe
-        self._label = self._configFields['label']
+        self._label = self._configFields.get('label', 'Person')
         self.logger.debug('Detecting label %r', self._label)
 
-        self._cameraName = self._configFields['camera_name']
-        self.logger.debug('Detecting via camera %r', self._cameraName)
+        if len(clients) != 2:
+            raise Exception('This component requires a camera component and a vision service as dependency to function.')
+        for client in clients:
+            if isinstance(client, VisionClient):
+                self._visionClient = client
+            elif isinstance(client, CameraClient):
+                self._cameraClient = client
+            else:
+                raise Exception('Found dependency %r, which is neither a VisionClient nor a CameraClient', client)
+        if self._visionClient is None:
+            raise Exception('Did not find vision in dependency')
+        if self._cameraClient is None:
+            raise Exception('Did not find camera in dependency')
 
-        visionClients = list(dependencies.values())
-        # hardcoding, should easily support multiple visionClients
-        if len(visionClients) > 1:
-            raise Exception("Currently does not support more than 1 dependency.")
-        if len(visionClients) < 1:
-            raise Exception("For sensor to function properly, please add a vision/mlmodel service as dependency.")
-        self._visionClient = visionClients[0]
-        LOGGER.info('self._visionClient %r', self._visionClient)
         return super().reconfigure(config, dependencies)
 
     async def get_readings(
@@ -110,7 +106,8 @@ class PeopleSensor(Sensor, EasyResource):
         assert isinstance(peopleDetector, Vision)
         """
 
-        detections = await self._visionClient.get_detections_from_camera(camera_name=self._cameraName)
+        image = await self._cameraClient.get_image()
+        detections = await self._visionClient.get_detections(image)
         labelString = self._label.lower() + "_detected"
         for detection in detections:
             if detection.class_name == self._label:

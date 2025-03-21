@@ -13,10 +13,13 @@ The following attribute template can be used to configure this model:
 
 ```json
 {
-"label": <string>,
-"camera_name": <string>
+"label": <string>
 }
 ```
+
+Note this sensor also requires the following as dependencies:
+- 1 x camera component
+- 1 x vision service
 
 #### Attributes
 
@@ -24,14 +27,12 @@ The following attributes are available for this model:
 
 | Name          | Type   | Inclusion | Description                |
 |---------------|--------|-----------|----------------------------|
-| `label` | string  | Required  | Name of label to detect from vision service |
-| `camera_name` | string | Required  | Name of camera to be used by vision service |
+| `label` | string  | Optional  | Name of label to detect from vision service, default to 'Person' |
 
 #### Example Configuration
 
 ```json
 {
-  "label": "Person",
-  "camera_name": "camera_1"
+  "label": "Chair"
 }
 ```
